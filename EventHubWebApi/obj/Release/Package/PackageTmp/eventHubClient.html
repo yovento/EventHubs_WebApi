@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <input type="text" value="0" id="value" />
+    <input type="button" value="Enviar Mensaje" onclick="sendMessage()" />
+    <label id="status"></label>
+
+    <script type="text/javascript">
+    function sendMessage() {
+        // Generar el token SAS por medio la herramienta EventHubs Signature Generator, https://github.com/sandrinodimattia/RedDog/releases/tag/0.2.0.1
+        var sas = "SharedAccessSignature sr=https%3a%2f%2feventhubwebapidevcamp-ns.servicebus.windows.net%2feventhubwebapidevcamp%2fpublishers%2fnavegador%2fmessages&sig=zpDzV6xwgedyVtMN2YLb8Y8uNzNKNSF74A5Bck%2fYupk%3d&se=1457437975&skn=Send";
+
+        var serviceNamespace = "eventhubwebapidevcamp-ns";
+        var hubName = "eventhubwebapidevcamp";
+        var deviceName = "navegador";
+
+        var xmlHttpRequest = new XMLHttpRequest();
+        xmlHttpRequest.open("POST", "https://" + serviceNamespace + ".servicebus.windows.net/" + hubName + "/publishers/" + deviceName + "/messages", true);
+
+        xmlHttpRequest.setRequestHeader("Access-Control-Allow-Origin", "*");
+        xmlHttpRequest.setRequestHeader("Access-Control-Allow-Credentials", "true");
+        xmlHttpRequest.setRequestHeader('Content-Type', "application/atom+xml;type=entry;charset=utf-8");
+        xmlHttpRequest.setRequestHeader("Authorization", sas);
+
+
+        xmlHttpRequest.onreadystatechange = function () {
+            if (this.readyState == 4) {
+
+                if (this.status == 201) {
+                    document.getElementById('status').innerText =
+                        'Enviado: ' + document.getElementById('value').value;
+                } else {
+                    document.getElementById('status').innerText =
+                        this.status;
+                }
+            }
+        };
+
+        xmlHttpRequest.send(document.getElementById('value').value);
+    }
+    </script>
+</body>
+</html>
+
+
